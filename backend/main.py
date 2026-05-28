@@ -1,3 +1,4 @@
+from agents.domain_classifier import classify_domain
 from fastapi import FastAPI, Depends
 
 from sqlalchemy.orm import Session
@@ -20,6 +21,15 @@ def home():
     }
 
 @app.post("/save-domain")
+@app.post("/classify-domain")
+def classify(user_input: str):
+
+    domain = classify_domain(user_input)
+
+    return {
+        "user_input": user_input,
+        "domain": domain
+    }
 def save_domain(
     name: str,
     db: Session = Depends(get_db)
@@ -30,6 +40,7 @@ def save_domain(
     db.add(new_domain)
 
     db.commit()
+
 
     db.refresh(new_domain)
 
