@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from database import engine, Base
 from db_dependency import get_db
@@ -51,9 +52,17 @@ def save_domain(
 
 
 @app.post("/classify-domain")
-def classify(user_input: str):
+def classify(
+    user_input: str,
+    db: Session = Depends(get_db)
+):
 
     domain = classify_domain(user_input)
+
+    new_domain = Domain(name=domain)
+
+    db.add(new_domain)
+    db.commit()
 
     return {
         "user_input": user_input,
@@ -88,3 +97,44 @@ def save_feedback(
     return {
         "message": "Feedback saved"
     }
+@app.get("/dashboard/stats")
+def dashboard_stats(
+    db: Session = Depends(get_db)
+):
+
+    total_domains = db.query(Domain).count()
+
+    total_feedback = db.query(Feedback).count()
+
+    return {
+        "total_domains": total_domains,
+        "total_feedback": total_feedback
+    }
+@app.get("/dashboard/domains")
+def get_domains(
+    db: Session = Depends(get_db)
+):
+
+    domains = db.query(Domain).all()
+
+    return [
+        {
+            "id": d.id,
+            "name": d.name
+        }
+        for d in domains
+    ]
+@app.get("/dashboard/feedback")
+def get_feedback(
+    db: Session = Depends(get_db)
+):
+
+    feedback_list = db.query(Feedback).all()
+
+    return [
+        {
+            "id": f.id,
+            "response": f.response
+        }
+        for f in feedback_list
+    ]
