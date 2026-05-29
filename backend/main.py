@@ -71,7 +71,23 @@ def classify(
 
 
 @app.post("/requirements")
-def get_requirements(user_input: str):
+def get_requirements(
+    user_input: str,
+    db: Session = Depends(get_db)
+):
+
+    domain = classify_domain(user_input)
+
+    new_domain = Domain(name=domain)
+    db.add(new_domain)
+    db.commit()
+
+    questions = generate_questions(domain)
+
+    return {
+        "domain": domain,
+        "questions": questions
+    }
 
     domain = classify_domain(user_input)
 

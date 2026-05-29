@@ -1,11 +1,13 @@
 import ProjectForm from "./components/ProjectForm";
+import Dashboard from "./components/Dashboard";
 import "./App.css";
 
 function App() {
   return (
-    <div>
+    <>
       <ProjectForm />
-    </div>
+      <Dashboard />
+    </>
   );
 }
 
