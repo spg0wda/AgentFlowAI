@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function Dashboard() {
-  const [stats, setStats] = useState({});
+  const [stats, setStats] = useState({
+    total_domains: 0,
+    total_feedback: 0,
+  });
+
   const [domains, setDomains] = useState([]);
   const [feedback, setFeedback] = useState([]);
 
@@ -27,16 +31,15 @@ function Dashboard() {
       setStats(statsRes.data);
       setDomains(domainsRes.data);
       setFeedback(feedbackRes.data);
-
     } catch (error) {
-      console.error(error);
+      console.error("Dashboard Error:", error);
     }
   };
 
   return (
     <div className="dashboard">
 
-      <h2>Dashboard</h2>
+      <h2>📊 AgentFlowAI Dashboard</h2>
 
       <div className="stats">
 
@@ -54,29 +57,37 @@ function Dashboard() {
 
       <div className="section">
 
-        <h3>Domains</h3>
+        <h3>📁 Domain History</h3>
 
-        <ul>
-          {domains.map((domain) => (
-            <li key={domain.id}>
-              {domain.name}
-            </li>
-          ))}
-        </ul>
+        {domains.length === 0 ? (
+          <p>No domains available.</p>
+        ) : (
+          <ul>
+            {domains.map((domain) => (
+              <li key={domain.id}>
+                {domain.name}
+              </li>
+            ))}
+          </ul>
+        )}
 
       </div>
 
       <div className="section">
 
-        <h3>Feedback History</h3>
+        <h3>💬 Feedback History</h3>
 
-        <ul>
-          {feedback.map((item) => (
-            <li key={item.id}>
-              {item.response}
-            </li>
-          ))}
-        </ul>
+        {feedback.length === 0 ? (
+          <p>No feedback submitted yet.</p>
+        ) : (
+          <ul>
+            {feedback.map((item) => (
+              <li key={item.id}>
+                {item.response}
+              </li>
+            ))}
+          </ul>
+        )}
 
       </div>
 

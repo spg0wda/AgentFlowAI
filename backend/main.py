@@ -59,16 +59,20 @@ def classify(
 
     domain = classify_domain(user_input)
 
-    new_domain = Domain(name=domain)
+    existing_domain = db.query(Domain).filter(
+        Domain.name == domain
+    ).first()
 
-    db.add(new_domain)
-    db.commit()
+    if not existing_domain:
+        new_domain = Domain(name=domain)
+
+        db.add(new_domain)
+        db.commit()
 
     return {
         "user_input": user_input,
         "domain": domain
     }
-
 
 @app.post("/requirements")
 def get_requirements(
@@ -78,9 +82,15 @@ def get_requirements(
 
     domain = classify_domain(user_input)
 
-    new_domain = Domain(name=domain)
-    db.add(new_domain)
-    db.commit()
+    existing_domain = db.query(Domain).filter(
+        Domain.name == domain
+    ).first()
+
+    if not existing_domain:
+        new_domain = Domain(name=domain)
+
+        db.add(new_domain)
+        db.commit()
 
     questions = generate_questions(domain)
 
@@ -88,16 +98,6 @@ def get_requirements(
         "domain": domain,
         "questions": questions
     }
-
-    domain = classify_domain(user_input)
-
-    questions = generate_questions(domain)
-
-    return {
-        "domain": domain,
-        "questions": questions
-    }
-
 
 @app.post("/feedback")
 def save_feedback(

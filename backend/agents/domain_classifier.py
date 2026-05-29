@@ -1,37 +1,30 @@
-import os
+from agents.groq_client import client
 
-from google import genai
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
-
-def classify_domain(user_input: str):
+def classify_domain(user_input):
 
     prompt = f"""
-    Classify this project into exactly ONE domain.
-
-    Domains:
-    - Healthcare
-    - Finance
-    - Insurance
-    - Education
-    - Ecommerce
-    - Technology
+    Classify the following project into one domain.
 
     Project:
     {user_input}
 
-    Return ONLY domain name.
+    Examples:
+    Hospital Management -> Healthcare
+    Stock Prediction -> Finance
+    Food Delivery -> E-commerce
+    Learning App -> Education
+
+    Return only the domain.
     """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
     )
 
-    return response.text.strip()
+    return response.choices[0].message.content.strip()

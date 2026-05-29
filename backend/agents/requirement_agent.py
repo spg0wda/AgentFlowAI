@@ -1,40 +1,30 @@
+from agents.groq_client import client
+
 def generate_questions(domain):
 
-    questions = {
+    prompt = f"""
+    Generate 5 requirement gathering questions
+    for a {domain} project.
 
-        "Healthcare": [
-            "Who are the users?",
-            "Do you need appointment booking?",
-            "Should doctors have separate login?",
-            "Do you need patient records?"
-        ],
+    Return only the questions.
+    """
 
-        "Finance": [
-            "Do users need bank accounts?",
-            "Do you need transaction history?",
-            "Should admin approve transactions?"
-        ],
-
-        "Insurance": [
-            "Do users submit claims?",
-            "Should agents verify claims?",
-            "Need policy management?"
-        ],
-
-        "Education": [
-            "Do students need login?",
-            "Should teachers upload courses?",
-            "Need exams module?"
-        ],
-
-        "Technology": [
-            "What type of software is required?",
-            "Do users need authentication?",
-            "Need cloud deployment?"
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
         ]
-    }
-
-    return questions.get(
-        domain,
-        ["Provide more project details."]
     )
+
+    text = response.choices[0].message.content
+
+    questions = text.split("\n")
+
+    return [
+        q.strip("- ").strip()
+        for q in questions
+        if q.strip()
+    ]
