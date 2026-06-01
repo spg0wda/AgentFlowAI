@@ -1,19 +1,19 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
 from database import engine, Base
 from db_dependency import get_db
 
 from models.domain_model import Domain
-from models.requirement_model import Requirement
 from models.feedback_model import Feedback
+from models.project_model import Project
 
 from agents.domain_classifier import classify_domain
 from agents.requirement_agent import generate_questions
+from agents.tech_stack_agent import recommend_tech_stack
 
 app = FastAPI()
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,7 +24,6 @@ app.add_middleware(
 )
 
 Base.metadata.create_all(bind=engine)
-
 
 @app.get("/")
 def home():
@@ -38,6 +37,16 @@ def save_domain(
     name: str,
     db: Session = Depends(get_db)
 ):
+
+    existing_domain = db.query(Domain).filter(
+        Domain.name == name
+    ).first()
+
+    if existing_domain:
+        return {
+            "message": "Domain already exists",
+            "domain": existing_domain.name
+        }
 
     new_domain = Domain(name=name)
 
@@ -92,12 +101,24 @@ def get_requirements(
         db.add(new_domain)
         db.commit()
 
-    questions = generate_questions(domain)
+    questions = generate_questions(user_input)
+    tech_stack = recommend_tech_stack(user_input)
+
+    project = Project(
+        idea=user_input,
+        domain=domain,
+        questions="\n".join(questions)
+    )
+
+    db.add(project)
+    db.commit()
 
     return {
         "domain": domain,
-        "questions": questions
+        "questions": questions,
+        "tech_stack": tech_stack
     }
+
 
 @app.post("/feedback")
 def save_feedback(
@@ -105,14 +126,18 @@ def save_feedback(
     db: Session = Depends(get_db)
 ):
 
-    item = Feedback(response=response)
+    feedback = Feedback(
+        response=response
+    )
 
-    db.add(item)
+    db.add(feedback)
     db.commit()
 
     return {
-        "message": "Feedback saved"
+        "message": "Feedback saved successfully"
     }
+
+
 @app.get("/dashboard/stats")
 def dashboard_stats(
     db: Session = Depends(get_db)
@@ -122,10 +147,14 @@ def dashboard_stats(
 
     total_feedback = db.query(Feedback).count()
 
+    total_projects = db.query(Project).count()
+
     return {
         "total_domains": total_domains,
-        "total_feedback": total_feedback
+        "total_feedback": total_feedback,
+        "total_projects": total_projects
     }
+
 @app.get("/dashboard/domains")
 def get_domains(
     db: Session = Depends(get_db)
@@ -153,4 +182,22 @@ def get_feedback(
             "response": f.response
         }
         for f in feedback_list
+    ]
+
+@app.get("/dashboard/projects")
+def get_projects(
+    db: Session = Depends(get_db)
+):
+
+    projects = db.query(Project).all()
+
+    return [
+        {
+            "id": p.id,
+            "idea": p.idea,
+            "domain": p.domain,
+            "questions": p.questions,
+            "created_at": p.created_at
+        }
+        for p in projects
     ]

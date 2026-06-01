@@ -47,11 +47,18 @@ function ProjectForm() {
 
   return (
     <div className="container">
-      <h1 className="title">AgentFlowAI</h1>
 
-      <p className="subtitle">
-        Smart Requirement Analysis using AI Agents
-      </p>
+  <div className="hero-badge">
+    🚀 AI Powered Requirement Engineering
+  </div>
+
+  <h1 className="title">
+    AgentFlowAI
+  </h1>
+
+  <p className="subtitle">
+    Smart Requirement Analysis using AI Agents
+  </p>
 
       <div className="card">
         <input
@@ -76,12 +83,18 @@ function ProjectForm() {
             <h4>Questions:</h4>
 
             <ul>
-              {result.questions.map((q, index) => (
-                <li key={index}>{q}</li>
-              ))}
-            </ul>
+  {result.questions.map((q, index) => (
+    <li key={index}>{q}</li>
+  ))}
+</ul>
 
-            <textarea
+<h4>🛠 Recommended Tech Stack</h4>
+
+<pre className="tech-stack">
+  {result.tech_stack}
+</pre>
+
+<textarea
               className="feedback-box"
               rows="5"
               placeholder="Enter your answers..."

@@ -8,17 +8,23 @@ client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
-def generate_questions(project_idea):
+def recommend_tech_stack(project_idea):
 
     prompt = f"""
-    You are a Senior Business Analyst.
+    You are a Senior Software Architect.
 
     Project Idea:
     {project_idea}
 
-    Generate 8 requirement gathering questions.
+    Recommend:
 
-    Return only questions.
+    Frontend
+    Backend
+    Database
+    Cloud Platform
+    AI Tools (if required)
+
+    Keep the response concise.
     """
 
     response = client.chat.completions.create(
@@ -31,12 +37,4 @@ def generate_questions(project_idea):
         ]
     )
 
-    text = response.choices[0].message.content
-
-    questions = [
-        q.strip()
-        for q in text.split("\n")
-        if q.strip()
-    ]
-
-    return questions
+    return response.choices[0].message.content
