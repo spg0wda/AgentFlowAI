@@ -5,6 +5,7 @@ import "../App.css";
 function ProjectForm() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
+  const [roadmap, setRoadmap] = useState("");
   const [feedback, setFeedback] = useState("");
 
   const handleSubmit = async () => {
@@ -20,6 +21,19 @@ function ProjectForm() {
       );
 
       setResult(response.data);
+      const roadmapResponse = await axios.post(
+  "http://127.0.0.1:8000/roadmap",
+  null,
+  {
+    params: {
+      user_input: input,
+    },
+  }
+);
+
+setRoadmap(
+  roadmapResponse.data.roadmap
+);
     } catch (error) {
       console.error(error);
       alert("Backend connection failed");
@@ -97,6 +111,11 @@ function ProjectForm() {
 
 <pre className="feasibility-box">
   {result.feasibility}
+</pre>
+<h4>📅 Development Roadmap</h4>
+
+<pre className="roadmap-box">
+  {roadmap}
 </pre>
 
 <textarea

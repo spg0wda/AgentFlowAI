@@ -11,6 +11,8 @@ from models.project_model import Project
 
 from agents.domain_classifier import classify_domain
 from agents.requirement_agent import generate_questions
+from agents.roadmap_agent import generate_roadmap
+
 from agents.tech_stack_agent import recommend_tech_stack
 from agents.feasibility_agent import analyze_feasibility
 from fastapi.responses import FileResponse
@@ -233,3 +235,15 @@ def download_report(
         filename=filename,
         media_type="application/pdf"
     )
+@app.post("/roadmap")
+def roadmap(
+    user_input: str
+):
+
+    roadmap_text = generate_roadmap(
+        user_input
+    )
+
+    return {
+        "roadmap": roadmap_text
+    }
