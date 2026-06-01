@@ -12,6 +12,9 @@ from models.project_model import Project
 from agents.domain_classifier import classify_domain
 from agents.requirement_agent import generate_questions
 from agents.tech_stack_agent import recommend_tech_stack
+from agents.feasibility_agent import analyze_feasibility
+from fastapi.responses import FileResponse
+from utils.pdf_generator import generate_project_report
 
 app = FastAPI()
 
@@ -103,6 +106,7 @@ def get_requirements(
 
     questions = generate_questions(user_input)
     tech_stack = recommend_tech_stack(user_input)
+    feasibility = analyze_feasibility(user_input)
 
     project = Project(
         idea=user_input,
@@ -116,7 +120,8 @@ def get_requirements(
     return {
         "domain": domain,
         "questions": questions,
-        "tech_stack": tech_stack
+        "tech_stack": tech_stack,
+        "feasibility": feasibility
     }
 
 
@@ -201,3 +206,30 @@ def get_projects(
         }
         for p in projects
     ]
+@app.get("/download-report/{project_id}")
+def download_report(
+    project_id: int,
+    db: Session = Depends(get_db)
+):
+
+    project = db.query(Project).filter(
+        Project.id == project_id
+    ).first()
+
+    if not project:
+        return {
+            "error": "Project not found"
+        }
+
+    filename = f"project_{project_id}.pdf"
+
+    generate_project_report(
+        filename,
+        project
+    )
+
+    return FileResponse(
+        path=filename,
+        filename=filename,
+        media_type="application/pdf"
+    )

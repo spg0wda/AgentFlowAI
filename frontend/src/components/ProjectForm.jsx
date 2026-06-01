@@ -93,6 +93,11 @@ function ProjectForm() {
 <pre className="tech-stack">
   {result.tech_stack}
 </pre>
+<h4>📈 Feasibility Analysis</h4>
+
+<pre className="feasibility-box">
+  {result.feasibility}
+</pre>
 
 <textarea
               className="feedback-box"
