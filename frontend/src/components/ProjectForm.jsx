@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "../App.css";
+import API_BASE_URL from "../config";
 
 function ProjectForm() {
   const [input, setInput] = useState("");
@@ -11,7 +12,7 @@ function ProjectForm() {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/requirements",
+        `${API_BASE_URL}/requirements`,
         null,
         {
           params: {
@@ -22,7 +23,7 @@ function ProjectForm() {
 
       setResult(response.data);
       const roadmapResponse = await axios.post(
-  "http://127.0.0.1:8000/roadmap",
+  `${API_BASE_URL}/roadmap`,
   null,
   {
     params: {
@@ -43,7 +44,7 @@ setRoadmap(
   const submitFeedback = async () => {
     try {
       await axios.post(
-        "http://127.0.0.1:8000/feedback",
+        `${API_BASE_URL}/feedback`,
         null,
         {
           params: {

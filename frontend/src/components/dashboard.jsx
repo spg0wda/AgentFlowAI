@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -19,19 +20,19 @@ function Dashboard() {
   const fetchDashboard = async () => {
     try {
       const statsRes = await axios.get(
-        "http://127.0.0.1:8000/dashboard/stats"
+        `${API_BASE_URL}/dashboard/stats`
       );
 
       const domainsRes = await axios.get(
-        "http://127.0.0.1:8000/dashboard/domains"
+        `${API_BASE_URL}/dashboard/domains`
       );
 
       const feedbackRes = await axios.get(
-        "http://127.0.0.1:8000/dashboard/feedback"
+        `${API_BASE_URL}/dashboard/feedback`
       );
 
       const projectsRes = await axios.get(
-        "http://127.0.0.1:8000/dashboard/projects"
+        `${API_BASE_URL}/dashboard/projects`
       );
 
       setStats(statsRes.data);
@@ -131,7 +132,7 @@ function Dashboard() {
                 className="download-btn"
                 onClick={() =>
                   window.open(
-                    `http://127.0.0.1:8000/download-report/${project.id}`
+                    `${API_BASE_URL}/download-report/${project.id}`
                   )
                 }
               >
