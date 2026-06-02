@@ -311,21 +311,23 @@ Main tables:
 
 Add your screenshots here:
 
-```text
-frontend screenshot
-dashboard screenshot
-PDF report screenshot
-```
+## 📸 Screenshots
 
-Example:
-
-```md
+### Home Page
 ![Home Page](screenshots/home.png)
-![Dashboard](screenshots/dashboard.png)
-![PDF Report](screenshots/pdf-report.png)
-```
 
----
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Features Page
+![Features Page](screenshots/features.png)
+
+### About Page
+![About Page](screenshots/about.png)
+
+### PDF Report
+![PDF Report](screenshots/pdf-report.png)
+
 
 ## 🎯 Future Enhancements
 
