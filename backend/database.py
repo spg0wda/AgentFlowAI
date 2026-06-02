@@ -1,24 +1,29 @@
-import os
-
-from dotenv import load_dotenv
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
-
-load_dotenv()
+from sqlalchemy.orm import sessionmaker, declarative_base
+from urllib.parse import quote_plus
+import os
 
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_PORT = os.getenv("MYSQL_PORT", "3306")
 MYSQL_DB = os.getenv("MYSQL_DB")
 
+MYSQL_USER = quote_plus(MYSQL_USER)
+MYSQL_PASSWORD = quote_plus(MYSQL_PASSWORD)
+
 DATABASE_URL = (
-    f"mysql+pymysql://{MYSQL_USER}:"
-    f"{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}"
+    f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}"
+    f"@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
 )
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={
+        "ssl": {}
+    }
+)
 
 SessionLocal = sessionmaker(
     autocommit=False,
