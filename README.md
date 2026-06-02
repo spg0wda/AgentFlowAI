@@ -6,6 +6,12 @@ It uses AI agents to classify project domains, generate requirement-gathering qu
 
 ---
 
+## 🌐 Live Demo
+
+Live Demo: https://agent-flow-ai-woad.vercel.app
+GitHub Repository: https://github.com/spg0wda/AgentFlowAI
+
+
 ## 🚀 Features
 
 * AI-powered domain classification
@@ -52,11 +58,6 @@ MySQL Database
  ↓
 Dashboard + PDF Report Export
 ```
-
----
-## 🌐 Live Demo
-
-Frontend Live URL: https://agent-flow-990e13blz-k-shiv-prakash-s-projects.vercel.app/
 
 ## 🛠️ Tech Stack
 
