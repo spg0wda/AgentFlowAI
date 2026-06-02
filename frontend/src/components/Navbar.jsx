@@ -9,9 +9,12 @@ function Navbar() {
 
       <div className="nav-links">
         <Link to="/">Home</Link>
+
         <Link to="/dashboard">Dashboard</Link>
-        <a href="#features">Features</a>
-        <a href="#about">About</a>
+
+        <Link to="/features">Features</Link>
+
+        <Link to="/about">About</Link>
       </div>
 
       <Link to="/" className="nav-btn">
