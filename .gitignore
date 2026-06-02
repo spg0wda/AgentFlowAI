@@ -2,7 +2,11 @@ venv/
 .env
 __pycache__/
 node_modules/
+frontend/node_modules/
 *.pyc
 .idea/
 .vscode/
 backend/project_*.pdf
+project_*.pdf
+frontend/dist/
+dist/
