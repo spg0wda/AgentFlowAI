@@ -5,3 +5,4 @@ node_modules/
 *.pyc
 .idea/
 .vscode/
+backend/project_*.pdf
