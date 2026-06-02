@@ -128,16 +128,14 @@ function Dashboard() {
                 {project.questions}
               </pre>
 
-              <button
-                className="download-btn"
-                onClick={() =>
-                  window.open(
-                    `${API_BASE_URL}/download-report/${project.id}`
-                  )
-                }
-              >
-                📄 Download PDF
-              </button>
+              <a
+  className="download-btn"
+  href={`${API_BASE_URL}/download-report/${project.id}`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  📄 Download PDF
+</a>
 
             </div>
           ))
