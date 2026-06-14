@@ -237,19 +237,3 @@ def download_report(report: ReportRequest):
             "Content-Disposition": "attachment; filename=AgentFlowAI_Report.pdf"
         }
     )
-@app.delete("/clear-data")
-def clear_all_data(db: Session = Depends(get_db)):
-
-    db.query(Feedback).delete()
-    db.query(Project).delete()
-    db.query(Domain).delete()
-
-    db.execute(text("ALTER TABLE feedback AUTO_INCREMENT = 1"))
-    db.execute(text("ALTER TABLE projects AUTO_INCREMENT = 1"))
-    db.execute(text("ALTER TABLE domains AUTO_INCREMENT = 1"))
-
-    db.commit()
-
-    return {
-        "message": "All existing data cleared successfully"
-    }
