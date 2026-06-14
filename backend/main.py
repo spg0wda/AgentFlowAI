@@ -10,16 +10,26 @@ from models.feedback_model import Feedback
 from models.project_model import Project
 
 from agents.domain_classifier import classify_domain
-from agents.requirement_agent import generate_questions
-from agents.roadmap_agent import generate_roadmap
-
-from agents.tech_stack_agent import recommend_tech_stack
-from agents.feasibility_agent import analyze_feasibility
-from fastapi.responses import FileResponse
+from agents.requirement_agent import (
+    generate_questions,
+    generate_tech_stack,
+    generate_feasibility
+)
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from typing import List
 from utils.pdf_generator import generate_project_report
 
-app = FastAPI()
+from sqlalchemy import text
 
+app = FastAPI()
+class ReportRequest(BaseModel):
+    project_idea: str
+    domain: str
+    questions: List[str]
+    tech_stack: str
+    feasibility: str
+    feedback: str
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,6 +39,7 @@ app.add_middleware(
 )
 
 Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
 def home():
@@ -88,6 +99,7 @@ def classify(
         "domain": domain
     }
 
+
 @app.post("/requirements")
 def get_requirements(
     user_input: str,
@@ -107,8 +119,10 @@ def get_requirements(
         db.commit()
 
     questions = generate_questions(user_input)
-    tech_stack = recommend_tech_stack(user_input)
-    feasibility = analyze_feasibility(user_input)
+
+    tech_stack = generate_tech_stack(user_input)
+
+    feasibility = generate_feasibility(user_input)
 
     project = Project(
         idea=user_input,
@@ -162,6 +176,7 @@ def dashboard_stats(
         "total_projects": total_projects
     }
 
+
 @app.get("/dashboard/domains")
 def get_domains(
     db: Session = Depends(get_db)
@@ -176,6 +191,8 @@ def get_domains(
         }
         for d in domains
     ]
+
+
 @app.get("/dashboard/feedback")
 def get_feedback(
     db: Session = Depends(get_db)
@@ -191,6 +208,7 @@ def get_feedback(
         for f in feedback_list
     ]
 
+
 @app.get("/dashboard/projects")
 def get_projects(
     db: Session = Depends(get_db)
@@ -203,47 +221,35 @@ def get_projects(
             "id": p.id,
             "idea": p.idea,
             "domain": p.domain,
-            "questions": p.questions,
-            "created_at": p.created_at
+            "questions": p.questions
         }
         for p in projects
     ]
-@app.get("/download-report/{project_id}")
-def download_report(
-    project_id: int,
-    db: Session = Depends(get_db)
-):
+@app.post("/download-report")
+def download_report(report: ReportRequest):
 
-    project = db.query(Project).filter(
-        Project.id == project_id
-    ).first()
+    pdf_buffer = generate_project_report(report.dict())
 
-    if not project:
-        return {
-            "error": "Project not found"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": "attachment; filename=AgentFlowAI_Report.pdf"
         }
-
-    filename = f"project_{project_id}.pdf"
-
-    generate_project_report(
-        filename,
-        project
     )
+@app.delete("/clear-data")
+def clear_all_data(db: Session = Depends(get_db)):
 
-    return FileResponse(
-        path=filename,
-        filename=filename,
-        media_type="application/pdf"
-    )
-@app.post("/roadmap")
-def roadmap(
-    user_input: str
-):
+    db.query(Feedback).delete()
+    db.query(Project).delete()
+    db.query(Domain).delete()
 
-    roadmap_text = generate_roadmap(
-        user_input
-    )
+    db.execute(text("ALTER TABLE feedback AUTO_INCREMENT = 1"))
+    db.execute(text("ALTER TABLE projects AUTO_INCREMENT = 1"))
+    db.execute(text("ALTER TABLE domains AUTO_INCREMENT = 1"))
+
+    db.commit()
 
     return {
-        "roadmap": roadmap_text
+        "message": "All existing data cleared successfully"
     }
